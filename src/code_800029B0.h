@@ -35,7 +35,7 @@ void clear_nmi_buffer(void);
 void func_80003040(void);
 
 extern s16 gCurrentlyLoadedCourseId;
-extern u16 D_800DC5A8;
+extern u16 gVolumeDecreaseToggleIter;
 extern s32 D_800DC5AC;
 extern u16 D_800DC5B0;
 extern u16 D_800DC5B4;
