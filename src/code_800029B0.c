@@ -30,7 +30,7 @@ extern s16 D_802BA048;
 s16 gCurrentCourseId = 0;
 #endif
 s16 gCurrentlyLoadedCourseId = 0xFF;
-u16 D_800DC5A8 = 0;
+u16 gVolumeDecreaseToggleIter = 0;
 s32 D_800DC5AC = 0;
 u16 D_800DC5B0 = 1;
 u16 D_800DC5B4 = 0;
