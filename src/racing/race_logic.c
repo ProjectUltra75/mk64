@@ -793,45 +793,77 @@ void func_8028F914(void) {
     func_8028F588();
 }
 
+/*
+	Handles the logic for pressing controller buttons during racing
+    that AREN'T directly involved in racing, such as the pause menu
+	and the weird L button toggle that turns down the music
+*/
 void func_8028F970(void) {
     s32 i;
 
-    if (D_8015F890) {
+    if (D_8015F890) { //! @NOTE: Value is never set to true in any part of the game.
         return;
     }
 
     //! @todo increasing players past four would require increase this loop iterator.
+
+	// Register all button presses on all controllers to a single variable
     for (i = 0; i < 4; i++) {
 
         Player* player = &gPlayers[i];
         struct Controller* controller = &gControllers[i];
 
-        if (!(player->type & PLAYER_HUMAN)) {
-            continue;
-        }
-        if (player->type & PLAYER_CPU) {
-            continue;
-        }
+		// Don't map the buttons to this variable if we aren't a player character
+        if (!(player->type & PLAYER_HUMAN)) { continue; }
+        if (player->type & PLAYER_CPU)      { continue; }
 
         if (gActiveScreenMode != SCREEN_MODE_3P_4P_SPLITSCREEN) {
-            if ((controller->buttonPressed & L_TRIG) && !(controller->button & R_TRIG)) {
-                controller->buttonPressed &= 0xFFDF;
 
-                D_800DC5A8++;
-                if (D_800DC5A8 >= 3) {
-                    D_800DC5A8 = 0;
+			//   BUTTON TOGGLE #1:
+			//
+			//   Decrease the volume (in increments) if any player presses the L button
+			//   [ ONLY IF THE GAME ISN'T IN 3P/4P SPLITSCREEN MODE ]
+
+            if ((controller->buttonPressed & L_TRIG) && 
+				!(controller->button & R_TRIG)) {   // For some reason this also checks if the R button
+				                                    // isn't currently being pressed, likely to prevent
+				                                    // players from accidentally pressing the button
+			                                        // during gameplay when they actually meant to press the hop button (although it still happens!)
+
+				controller->buttonPressed &= 0xFFDF; // (0xFFFF - L_TRIG)
+				// Clear the L button from the controller buffer
+				
+                gVolumeDecreaseToggleIter++;
+                if (gVolumeDecreaseToggleIter >= 3) {
+                    gVolumeDecreaseToggleIter = 0;
                 }
+
+				// Play the respective toggle SFX
                 play_sound2(SOUND_ACTION_PING);
                 func_800029B0();
             }
         }
-        if ((controller->buttonPressed & START_BUTTON) && (!(controller->button & R_TRIG)) &&
-            (!(controller->button & L_TRIG))) {
+
+		//   BUTTON TOGGLE #2:
+		//
+		//   Pause the game if any player presses the START button
+		
+        if ((controller->buttonPressed & START_BUTTON) && 
+			(!(controller->button & R_TRIG)) && (!(controller->button & L_TRIG))) { // For some reason this also checks
+			                                                                        // if the R button isn't being pressed, as well as
+			                                                                        // if the L button isn't being pressed...
+			                                                                        // ...why?
+
             func_8028DF00();
+
             gIsGamePaused = (controller - gControllerOne) + 1;
-            controller->buttonPressed = 0;
+
+            controller->buttonPressed = 0; // Clear all buttons from the controller buffer
+
             func_800C9F90(1);
+
             gPauseTriggered = 1;
+
             if (gModeSelection == TIME_TRIALS) {
                 if (gPlayerOne->type & (PLAYER_EXISTS | PLAYER_INVISIBLE_OR_BOMB)) {
                     func_80005AE8(gPlayerOne);
@@ -847,17 +879,36 @@ void func_8028F970(void) {
         }
     }
 
+	//   DEBUG BUTTON TOGGLES
+	//
+	//   These are some debug button toggles that only work if gEnableDebugMode is set to true.
+	//   They aren't really that interesting though.
+
     if (gEnableDebugMode) {
+
         if (gModeSelection == BATTLE) {
-            // do stuff?
+            // Do nothing (possibly commented-out)
+
         } else {
+
+			//   DEBUG BUTTON TOGGLE #1:
+		    //
+		    //  Set the current lap of player ID #1 to Lap 3 if D-PAD UP is pressed on Controller 1
             if (gControllerOne->buttonPressed & U_JPAD) {
                 gLapCountByPlayerId[0] = 2;
             }
+
+			//   DEBUG BUTTON TOGGLE #2:
+		    //
+		    //   Set the current lap of player IDs #1 and #2 to Lap 3 if D-PAD RIGHT is pressed on Controller 1
             if (gControllerOne->buttonPressed & R_JPAD) {
                 gLapCountByPlayerId[0] = 2;
                 gLapCountByPlayerId[1] = 2;
             }
+
+			//   DEBUG BUTTON TOGGLE #3:
+		    //
+		    //   Set the current lap of all player IDs to Lap 3 if D-PAD DOWN is pressed on Controller 1
             if (gControllerOne->buttonPressed & D_JPAD) {
                 gLapCountByPlayerId[0] = 2;
                 gLapCountByPlayerId[1] = 2;
