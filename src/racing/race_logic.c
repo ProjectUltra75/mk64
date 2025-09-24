@@ -854,12 +854,10 @@ void func_8028F970(void) {
 
             func_8028DF00();
 
-            gIsGamePausedAndPlayerNum = (controller - gControllerOne) + 1; // Set the pause flag to true, and keep track of which player has paused the game.
+            gIsGamePausedAndPlayerNum = (controller - gControllerOne) + 1; // Keep track of which player has paused the game
 
-            controller->buttonPressed = 0;
-			// Clear all button presses from the controller buffer,
-			// but retain all held buttons in case the game
-			// is unpaused.
+            controller->buttonPressed = 0x0000;
+			// Clear all button presses from the controller buffer
 
             func_800C9F90(1);
 
@@ -882,11 +880,7 @@ void func_8028F970(void) {
 
 	//   DEBUG BUTTON TOGGLES
 	//
-	//   These are some debug button toggles that only work if gEnableDebugMode is set to true.
-	//   They aren't really that interesting though.
-	//
-	//   @BUG: This feature is broken. 
-	//         Re-enabling it makes the kart become uncontrollable and do all sorts of weird stuff.
+	//   These only work when debug mode is active.
 
     if (gEnableDebugMode) {
 
@@ -1141,7 +1135,7 @@ void func_8028FCBC(void) {
 }
 
 /* 
-	Menu transition functions likely used for testing.
+	Menu transition functions that were likely once used for testing.
 
 	Never called by the game.
 */
