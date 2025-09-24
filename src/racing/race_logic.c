@@ -1140,35 +1140,16 @@ void func_8028FCBC(void) {
     }
 }
 
-UNUSED void func_80290314(void) {
-    gIsInQuitToMenuTransition = 1;
-    gQuitToMenuTransitionCounter = 5;
-    gGotoMode = START_MENU_FROM_QUIT;
-}
+/* 
+	Menu transition functions likely used for testing.
 
-void func_80290338(void) {
-    gIsInQuitToMenuTransition = 1;
-    gQuitToMenuTransitionCounter = 5;
-    gGotoMode = MAIN_MENU_FROM_QUIT;
-}
-
-void func_80290360(void) {
-    gIsInQuitToMenuTransition = 1;
-    gQuitToMenuTransitionCounter = 5;
-    gGotoMode = PLAYER_SELECT_MENU_FROM_QUIT;
-}
-
-void func_80290388(void) {
-    gIsInQuitToMenuTransition = 1;
-    gQuitToMenuTransitionCounter = 5;
-    gGotoMode = COURSE_SELECT_MENU_FROM_QUIT;
-}
-
-void func_802903B0(void) {
-    gIsInQuitToMenuTransition = 1;
-    gQuitToMenuTransitionCounter = 5;
-    gGotoMode = RACING;
-}
+	Never called by the game.
+*/
+UNUSED void func_80290314(void) { gIsInQuitToMenuTransition = 1; gQuitToMenuTransitionCounter = 5; gGotoMode = START_MENU_FROM_QUIT;         }
+UNUSED void func_80290338(void) { gIsInQuitToMenuTransition = 1; gQuitToMenuTransitionCounter = 5; gGotoMode = MAIN_MENU_FROM_QUIT;          }
+UNUSED void func_80290360(void) { gIsInQuitToMenuTransition = 1; gQuitToMenuTransitionCounter = 5; gGotoMode = PLAYER_SELECT_MENU_FROM_QUIT; }
+UNUSED void func_80290388(void) { gIsInQuitToMenuTransition = 1; gQuitToMenuTransitionCounter = 5; gGotoMode = COURSE_SELECT_MENU_FROM_QUIT; }
+UNUSED void func_802903B0(void) { gIsInQuitToMenuTransition = 1; gQuitToMenuTransitionCounter = 5; gGotoMode = RACING;                       }
 
 void func_802903D8(Player* playerOne, Player* playerTwo) {
     f32 sp70 = (playerOne->boundingBoxSize + playerTwo->boundingBoxSize) - 5.0f;
