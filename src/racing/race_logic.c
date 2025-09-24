@@ -801,9 +801,7 @@ void func_8028F914(void) {
 void func_8028F970(void) {
     s32 i;
 
-    if (D_8015F890) { //! @NOTE: Value is never set to true in any part of the game.
-        return;
-    }
+    if (D_8015F890) { return; } // ???
 
     //! @todo increasing players past four would require increase this loop iterator.
 
@@ -821,44 +819,47 @@ void func_8028F970(void) {
 
 			//   BUTTON TOGGLE #1:
 			//
-			//   Decrease the volume (in increments) if any player presses the L button
-			//   [ ONLY IF THE GAME ISN'T IN 3P/4P SPLITSCREEN MODE ]
+			//   Decrease the volume (in increments) if any player presses the L button.
+			//
+			//   This toggle is purposefully disabled in 3P/4P splitscreen mode,
+			//   since music is disabled during 3P/4P splitscreen, making this toggle redundant.
 
             if ((controller->buttonPressed & L_TRIG) && 
-				!(controller->button & R_TRIG)) {   // For some reason this also checks if the R button
-				                                    // isn't currently being pressed, likely to prevent
-				                                    // players from accidentally pressing the button
-			                                        // during gameplay when they actually meant to press the hop button (although it still happens!)
+				!(controller->button & R_TRIG)) {   // This also checks if the R button
+				                                    // isn't currently being held
 
 				controller->buttonPressed &= 0xFFDF; // (0xFFFF - L_TRIG)
-				// Clear the L button from the controller buffer
+				// Clear only the L button from the controller buffer
 				
                 gVolumeDecreaseToggleIter++;
+
                 if (gVolumeDecreaseToggleIter >= 3) {
                     gVolumeDecreaseToggleIter = 0;
-                }
+				}
 
-				// Play the respective toggle SFX
                 play_sound2(SOUND_ACTION_PING);
+
                 func_800029B0();
             }
         }
 
 		//   BUTTON TOGGLE #2:
 		//
-		//   Pause the game if any player presses the START button
+		//   Pause the game if any player presses the START button.
 		
         if ((controller->buttonPressed & START_BUTTON) && 
-			(!(controller->button & R_TRIG)) && (!(controller->button & L_TRIG))) { // For some reason this also checks
-			                                                                        // if the R button isn't being pressed, as well as
-			                                                                        // if the L button isn't being pressed...
-			                                                                        // ...why?
+			(!(controller->button & R_TRIG)) && (!(controller->button & L_TRIG))) { // This also checks if the 
+			                                                                        // R button & L button isn't 
+			                                                                        // currently being held.
 
             func_8028DF00();
 
-            gIsGamePaused = (controller - gControllerOne) + 1;
+            gIsGamePausedAndPlayerNum = (controller - gControllerOne) + 1; // Set the pause flag to true, and keep track of which player has paused the game.
 
-            controller->buttonPressed = 0; // Clear all buttons from the controller buffer
+            controller->buttonPressed = 0;
+			// Clear all button presses from the controller buffer,
+			// but retain all held buttons in case the game
+			// is unpaused.
 
             func_800C9F90(1);
 
@@ -883,24 +884,27 @@ void func_8028F970(void) {
 	//
 	//   These are some debug button toggles that only work if gEnableDebugMode is set to true.
 	//   They aren't really that interesting though.
+	//
+	//   @BUG: This feature is broken. 
+	//         Re-enabling it makes the kart become uncontrollable and do all sorts of weird stuff.
 
     if (gEnableDebugMode) {
 
         if (gModeSelection == BATTLE) {
-            // Do nothing (possibly commented-out)
+            // (commented-out)
 
         } else {
 
 			//   DEBUG BUTTON TOGGLE #1:
 		    //
-		    //  Set the current lap of player ID #1 to Lap 3 if D-PAD UP is pressed on Controller 1
+		    //  Set the current lap of player ID #1 to Lap 3 if D-PAD UP is pressed on Controller 1.
             if (gControllerOne->buttonPressed & U_JPAD) {
                 gLapCountByPlayerId[0] = 2;
             }
 
 			//   DEBUG BUTTON TOGGLE #2:
 		    //
-		    //   Set the current lap of player IDs #1 and #2 to Lap 3 if D-PAD RIGHT is pressed on Controller 1
+		    //   Set the current lap of player IDs #1 and #2 to Lap 3 if D-PAD RIGHT is pressed on Controller 1.
             if (gControllerOne->buttonPressed & R_JPAD) {
                 gLapCountByPlayerId[0] = 2;
                 gLapCountByPlayerId[1] = 2;
@@ -908,7 +912,7 @@ void func_8028F970(void) {
 
 			//   DEBUG BUTTON TOGGLE #3:
 		    //
-		    //   Set the current lap of all player IDs to Lap 3 if D-PAD DOWN is pressed on Controller 1
+		    //   Set the current lap of all player IDs to Lap 3 if D-PAD DOWN is pressed on Controller 1.
             if (gControllerOne->buttonPressed & D_JPAD) {
                 gLapCountByPlayerId[0] = 2;
                 gLapCountByPlayerId[1] = 2;
